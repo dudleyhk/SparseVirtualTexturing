@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Core">
+      <UniqueIdentifier>{398cd88a-186c-4abf-93b8-249359fb05b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{3f122999-849d-45f0-b5de-ed857aaa7df2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Vertex Shader">
+      <UniqueIdentifier>{653be0fd-809f-4865-a92a-a1a3b91bd3cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Fragment Shader">
+      <UniqueIdentifier>{46bca913-b6bf-4e7e-b89c-4c21d468f5e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Managers">
+      <UniqueIdentifier>{62c27ff3-c540-4ffd-b506-383bdd2ff831}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Init">
+      <UniqueIdentifier>{f62b0ca9-9bc7-4443-90d7-04c1e9a3eeef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Core">
+      <UniqueIdentifier>{10f44a6d-8716-4059-ae2f-34084a24c786}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Core\Source Files">
+      <UniqueIdentifier>{50638021-be78-4def-a2e1-ff48a3bc22a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Core\Header Files">
+      <UniqueIdentifier>{41dae304-bf18-4b95-bf23-967852255eaa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Init\Header Files">
+      <UniqueIdentifier>{c5567a09-5631-4ab3-b953-07cae70b7b38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Init\Source Files">
+      <UniqueIdentifier>{93523bd8-c571-4fe0-95ec-b134e34b39dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering">
+      <UniqueIdentifier>{525be6e1-f739-424e-9379-c69bd739062a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Models">
+      <UniqueIdentifier>{700c7c62-02a2-4718-b98d-e8b98d667d95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Managers\Header Files">
+      <UniqueIdentifier>{84054c0b-2380-43a6-951b-d0490e74941b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Managers\Source Files">
+      <UniqueIdentifier>{70fe3449-adb2-4ddb-8917-c2b774ed0826}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Models\Header Files">
+      <UniqueIdentifier>{e40a3fe4-15de-4141-8cad-7fde083e4c59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Models\Source Files">
+      <UniqueIdentifier>{9d3be4d6-54b9-471e-80e1-10d2542c4c7d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Texture">
+      <UniqueIdentifier>{d0977275-63fa-4bdc-bf8b-4b9a5b704127}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Core\Init\InitGLEW.cpp">
+      <Filter>Core\Init\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Init\InitGLUT.cpp">
+      <Filter>Core\Init\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Managers\ShaderManager.cpp">
+      <Filter>Managers\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Managers\ModelsManager.cpp">
+      <Filter>Managers\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Managers\SceneManager.cpp">
+      <Filter>Managers\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\Models\Triangle.cpp">
+      <Filter>Rendering\Models\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\Models\Quad.cpp">
+      <Filter>Rendering\Models\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\Models\Model.cpp">
+      <Filter>Rendering\Models\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\Texture\Texture.cpp">
+      <Filter>Rendering\Texture</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Core\Init\WindowInfo.h">
+      <Filter>Core\Init\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Init\ContextInfo.h">
+      <Filter>Core\Init\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Init\FrameBufferInfo.h">
+      <Filter>Core\Init\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Init\InitGLEW.h">
+      <Filter>Core\Init\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Init\InitGLUT.h">
+      <Filter>Core\Init\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Core\ContainerUtilities.h">
+      <Filter>Core\Core\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Core\IListener.h">
+      <Filter>Core\Core\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\IGameObject.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Core\VertexFormat.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Managers\ShaderManager.h">
+      <Filter>Managers\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Managers\SceneManager.h">
+      <Filter>Managers\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Managers\ModelsManager.h">
+      <Filter>Managers\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Models\Triangle.h">
+      <Filter>Rendering\Models\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Models\Quad.h">
+      <Filter>Rendering\Models\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Models\Model.h">
+      <Filter>Rendering\Models\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Texture\Texture.h">
+      <Filter>Rendering\Texture</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\FragmentShaders\FragmentShader.glsl">
+      <Filter>Shaders\Fragment Shader</Filter>
+    </None>
+    <None Include="Shaders\VertexShaders\VertexShader.glsl">
+      <Filter>Shaders\Vertex Shader</Filter>
+    </None>
+    <None Include="Shaders\VertexShaders\TextureShaderVS.glsl">
+      <Filter>Shaders\Vertex Shader</Filter>
+    </None>
+    <None Include="Shaders\FragmentShaders\TextureShaderFS.glsl">
+      <Filter>Shaders\Fragment Shader</Filter>
+    </None>
+  </ItemGroup>
+</Project>
