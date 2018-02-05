@@ -73,8 +73,24 @@ SceneManager::SceneManager()
 		std::cout << "ERROR: Failed to load texture" << std::endl;
 	}
 	stbi_image_free(data);
-
 	// TODO: Output image loaded details in TextureManager
+
+
+
+
+	// https://en.wikibooks.org/wiki/OpenGL_Programming/Modern_OpenGL_Tutorial_Load_OBJ
+	std::vector<GLuint> vertexIndices, uvIndices, normalIndices;
+	std::vector<glm::vec3> temp_vertices, temp_normals;
+	std::vector<glm::vec2> temp_normals;
+
+	FILE* file = fopen("..//Resources//Model.obj", "r");
+	if(file == nullptr)
+	{
+		std::cout << "Impossible to open the file ! \n" << std::endl;
+		return;
+	}
+
+
 }
 
 
@@ -92,14 +108,28 @@ void SceneManager::NotifyDisplayFrame()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 
+	
+	
 
-	glutSolidTeapot(.5);
-	glutEnterGameMode();
 
-	glFlush();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	//glBindTexture(GL_TEXTURE_2D, texture);
-	//models_manager->Draw();
+	models_manager->Draw();
 }
 
 void SceneManager::NotifyEndFrame()

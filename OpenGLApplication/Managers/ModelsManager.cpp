@@ -35,6 +35,8 @@ ModelsManager::~ModelsManager()
 	gameModels.clear();
 }
 
+
+
 void ModelsManager::DeleteModel(const std::string& gameModelName)
 {
 	if(!Algorithms::Map::contains(gameModels, gameModelName))
@@ -48,6 +50,8 @@ void ModelsManager::DeleteModel(const std::string& gameModelName)
 	gameModels.erase(gameModelName);
 }
 
+
+
 const IGameObject& ModelsManager::GetModel(const std::string& gameModelName) const
 {
 	if(!Algorithms::Map::contains(gameModels, gameModelName))
@@ -57,6 +61,8 @@ const IGameObject& ModelsManager::GetModel(const std::string& gameModelName) con
 	return *gameModels.at(gameModelName).get();
 }
 
+
+
 void ModelsManager::Update()
 {
 	for(const auto& model : gameModels)
@@ -64,6 +70,8 @@ void ModelsManager::Update()
 		model.second->Update();
 	}
 }
+
+
 
 void ModelsManager::Draw()
 {

@@ -50,7 +50,7 @@ void InitGLUT::Init(const Core::WindowInfo& windowInfo, const Core::ContextInfo&
 
 	Init::InitGLEW::Init();
 
-	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
+	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE /*| GLUT_GEOMETRY_VISUALIZE_NORMALS*/, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
 
 	PrintOpenGLInfo(windowInfo, contextInfo);
 }
