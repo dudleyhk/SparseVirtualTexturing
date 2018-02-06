@@ -4,6 +4,7 @@
 
 */
 #include <fstream>
+#include <sstream>
 
 #include "SceneManager.h"
 
@@ -76,19 +77,15 @@ SceneManager::SceneManager()
 	// TODO: Output image loaded details in TextureManager
 
 
+	std::vector<glm::vec4> vertices;
+	std::vector<glm::vec3> normals;
+	std::vector<GLushort> elements;
+
+	// This call somewhere more suitable. 
+	LoadObject("..//Resources//Model.obj", vertices, normals, elements);
 
 
-	// https://en.wikibooks.org/wiki/OpenGL_Programming/Modern_OpenGL_Tutorial_Load_OBJ
-	std::vector<GLuint> vertexIndices, uvIndices, normalIndices;
-	std::vector<glm::vec3> temp_vertices, temp_normals;
-	std::vector<glm::vec2> temp_normals;
 
-	FILE* file = fopen("..//Resources//Model.obj", "r");
-	if(file == nullptr)
-	{
-		std::cout << "Impossible to open the file ! \n" << std::endl;
-		return;
-	}
 
 
 }
@@ -141,4 +138,77 @@ void SceneManager::NotifyResize(int width, int height,
 								  int previous_width, int previous_height)
 {
 	//nothing here for the moment 
+}
+
+
+
+/* Code to open and load a model file. 
+TODO: Put this into it own class.
+
+// https://en.wikibooks.org/wiki/OpenGL_Programming/Modern_OpenGL_Tutorial_Load_OBJ*/
+	
+void SceneManager::LoadObject(const char* filename, std::vector<glm::vec4> &vertices, std::vector<glm::vec3> &normals, std::vector<GLushort> &elements)
+{	
+	std::ifstream in(filename, std::ios::in);
+	if(!in)
+	{
+		std::cout << "Cannot open file - " << filename << std::endl;
+		return;
+	}
+
+	std::string line;
+	while(getline(in, line))
+	{
+		if(line.substr(0, 2) == "v ")
+		{
+			std::istringstream s(line.substr(2));
+			glm::vec4 v;
+			s >> v.x >> v.y >> v.z;
+			v.w = 1.0f;
+			vertices.push_back(v);
+			std::cout << "vert: (" << v.x << ", " << v.y << ", " << v.z << ", " << v.w << ")" << std::endl;
+		}
+		else if (line.substr(0, 2) == "f ")
+		{
+			std::string str;
+			std::istringstream s(line.substr(2));
+		
+
+			// TODO: run through each element and check the first value of 
+			//			each block of numbers.
+			// while(s != s.end())
+			GLushort a, b, c;
+			s >> a;
+			s >> b;
+			s >> c;
+			a--; b--; c--;
+			elements.push_back(a);
+			elements.push_back(b);
+			elements.push_back(c);
+		}
+		else if (line[0] == '#')
+		{
+			// ignore this line.
+		}
+		else
+		{
+			// ignore this line.
+		}
+	}
+
+	normals.resize(vertices.size(), glm::vec3(0.f, 0.f, 0.f));
+	for(auto i = 0; i < elements.size(); i += 3)
+	{
+		auto ia = elements[i];
+		auto ib = elements[i + 1];
+		auto ic = elements[i + 2];
+
+		glm::vec3 normal = glm::normalize(glm::cross(
+			glm::vec3(vertices[ib]) - glm::vec3(vertices[ia]),
+			glm::vec3(vertices[ic]) - glm::vec3(vertices[ia])));
+
+		normals[ia] = normal;
+		normals[ib] = normal;
+		normals[ic] = normal;
+	}
 }

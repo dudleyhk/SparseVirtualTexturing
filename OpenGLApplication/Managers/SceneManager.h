@@ -29,6 +29,8 @@ namespace Managers
 								  int previousWidth, int previousHeight);
 
 	private:
+		void LoadObject(const char* filename, std::vector<glm::vec4> &vertices, std::vector<glm::vec3> &normals, std::vector<GLushort> &elements);
+
 		GLuint texture;
 
 		std::unique_ptr<Managers::ShaderManager> shader_manager = nullptr;
