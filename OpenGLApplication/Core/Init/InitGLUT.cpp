@@ -68,6 +68,16 @@ void InitGLUT::Close()
 	glutLeaveMainLoop();
 }
 
+int InitGLUT::GetWidth()
+{
+	return glutGet(GLUT_WINDOW_WIDTH);
+}
+
+int InitGLUT::GetHeight()
+{
+	return glutGet(GLUT_WINDOW_HEIGHT);
+}
+
 void InitGLUT::EnterFullscreen()
 {
 	glutFullScreen();

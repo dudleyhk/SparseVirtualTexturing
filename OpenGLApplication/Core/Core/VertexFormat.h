@@ -4,7 +4,8 @@
 
 */
 #pragma once
-#include "Dependencies\GLM\glm.hpp"
+#include "..\..\Dependencies\GLM\glm.hpp"
+
 
 namespace Renderering
 {

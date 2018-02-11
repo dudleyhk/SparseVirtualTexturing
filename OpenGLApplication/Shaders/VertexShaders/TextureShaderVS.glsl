@@ -6,13 +6,16 @@ layout(location = 2) in vec2 in_texCoord;
 out vec4 colour;
 out vec2 texCoord;
 
+uniform mat4 trans;
+uniform mat4 view;
+uniform mat4 proj;
 
 
 void main()
 {
-	gl_Position = vec4(in_position, 1.0);
-	colour = in_colour;
+	colour    = in_colour;
+	texCoord  = in_texCoord;
 
-	// Do this because most images y coords are inverted with openGL.
-	texCoord    = in_texCoord; //vec2(in_texCoord.x, 1.0 - in_texCoord.y);
+	gl_Position = proj * view * trans * vec4(in_position, 1.f);
+
 }

@@ -3,8 +3,6 @@
 
 
 */
-#include <fstream>
-#include <sstream>
 
 #include "SceneManager.h"
 
@@ -12,6 +10,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "../Dependencies/STB/stb_image.h"
 
+#include "../Core/Init/InitGLUT.h"
 
 
 using namespace Managers;
@@ -76,24 +75,58 @@ SceneManager::SceneManager()
 	stbi_image_free(data);
 	// TODO: Output image loaded details in TextureManager
 
+	
 
-	std::vector<glm::vec4> vertices;
-	std::vector<glm::vec3> normals;
-	std::vector<GLushort> elements;
+	// TODO: Encapsulate this... This is the setup of a frame buffer object.
+	// A frame buffer allows you to draw to a memory buffer instead of a screen buffer.
+	glGenFramebuffers(1, &fbo);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+	
+	glGenRenderbuffers(1, &render_buffer);
+	glBindRenderbuffer(GL_RENDERBUFFER, render_buffer);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_BGRA, Core::Init::InitGLUT::GetWidth(), Core::Init::InitGLUT::GetHeight());
+	glBindRenderbuffer(GL_RENDERBUFFER, 0); // Unbind
+	
+	glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, render_buffer);
 
-	// This call somewhere more suitable. 
-	LoadObject("..//Resources//Model.obj", vertices, normals, elements);
+
+	bool status = glCheckFramebufferStatus(fbo);
+	if(!status)
+	{
+		std::cout << "ERROR: Initialising the Framebuffer" << std::endl;
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0); // unbind
 
 
+	/* Init Pixel Buffer Object */
+	GLint channel_count = 4;
+	GLint data_size = Core::Init::InitGLUT::GetWidth() * Core::Init::InitGLUT::GetHeight() * channel_count;
+	
+	// Create two pixel buffer objects to speed up the streaming transfer performance
+	// These two pbos are being used to pack data in from the FBO. 
+	// glGenBuffersARB(4, pbo); // Add another two at the end to unpack from.
+	glGenBuffersARB(2, pbo);
+	glBindBufferARB(GL_PIXEL_PACK_BUFFER_ARB, pbo[0]);
+	glBufferDataARB(GL_PIXEL_PACK_BUFFER_ARB, data_size, 0, GL_STREAM_DRAW_ARB);
+	glBindBufferARB(GL_PIXEL_PACK_BUFFER_ARB, pbo[1]);
+	glBufferDataARB(GL_PIXEL_PACK_BUFFER_ARB, data_size, 0, GL_STREAM_DRAW_ARB);
+	glBindBufferARB(GL_PIXEL_PACK_BUFFER_ARB, 0);
+}
 
-
-
+SceneManager::~SceneManager()
+{
+	glDeleteFramebuffers(1, &fbo);
+	glDeleteRenderbuffers(1, &render_buffer);
+	
+	glDeleteBuffers(2, pbo);
 }
 
 
 void SceneManager::NotifyBeginFrame()
 {
 	models_manager->Update();
+
 
 	// TODO: Create an interface class to handle the Parsing and Generation
 	// GenerationTool::Core::Init init;
@@ -102,37 +135,71 @@ void SceneManager::NotifyBeginFrame()
 
 void SceneManager::NotifyDisplayFrame()
 {
+	/* WRITE TO PIXEL BUFFER OBJECT */
+
+	// "index" is used to read pixels from framebuffer to a PBO
+	// "nextIndex" is used to update pixels in the other PBO
+	static int index = 0;
+	int nextIndex = 0;                  // pbo index used for next frame
+	
+	index = (index + 1) % 2;
+	nextIndex = (index + 1) % 2;
+
+	glReadBuffer(GL_BACK);
+
+	auto window_width = glutGet(GLUT_WINDOW_WIDTH);
+	auto window_height = glutGet(GLUT_WINDOW_HEIGHT);
+
+
+	// copy pixels from framebuffer to PBO
+	// Use offset instead of ponter.
+	// OpenGL should perform asynch DMA transfer, so glReadPixels() will return immediately.
+	glBindBufferARB(GL_PIXEL_PACK_BUFFER_ARB, pbo[index]);
+	glReadPixels(0, 0, window_width, window_height, GL_BGRA, GL_UNSIGNED_BYTE, 0);
+
+	// map the PBO that contain framebuffer pixels before processing it
+	glBindBufferARB(GL_PIXEL_PACK_BUFFER_ARB, pbo[nextIndex]);
+	GLubyte* src = (GLubyte*)glMapBufferARB(GL_PIXEL_PACK_BUFFER_ARB, GL_READ_ONLY_ARB);
+	if(src)
+	{
+		// proccessPixels(src, ...);
+		glUnmapBufferARB(GL_PIXEL_PACK_BUFFER_ARB);
+	}
+	glBindBufferARB(GL_PIXEL_PACK_BUFFER_ARB, 0);
+
+
+
+
+
+	/* RENDER TO THE FRAMEBUFFER */
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 
+	models_manager->Draw();
+	
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	
+
+
+
+
+
+	/* RENDER TO SCREEN BUFFER. */
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearColor(0.0, 0.0, 0.0, 1.0);
 	
 	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	//glBindTexture(GL_TEXTURE_2D, texture);
 	models_manager->Draw();
+
+
 }
 
 void SceneManager::NotifyEndFrame()
 {
-	//nothing here for the moment
-}
+	}
 
 void SceneManager::NotifyResize(int width, int height,
 								  int previous_width, int previous_height)
@@ -141,74 +208,3 @@ void SceneManager::NotifyResize(int width, int height,
 }
 
 
-
-/* Code to open and load a model file. 
-TODO: Put this into it own class.
-
-// https://en.wikibooks.org/wiki/OpenGL_Programming/Modern_OpenGL_Tutorial_Load_OBJ*/
-	
-void SceneManager::LoadObject(const char* filename, std::vector<glm::vec4> &vertices, std::vector<glm::vec3> &normals, std::vector<GLushort> &elements)
-{	
-	std::ifstream in(filename, std::ios::in);
-	if(!in)
-	{
-		std::cout << "Cannot open file - " << filename << std::endl;
-		return;
-	}
-
-	std::string line;
-	while(getline(in, line))
-	{
-		if(line.substr(0, 2) == "v ")
-		{
-			std::istringstream s(line.substr(2));
-			glm::vec4 v;
-			s >> v.x >> v.y >> v.z;
-			v.w = 1.0f;
-			vertices.push_back(v);
-			std::cout << "vert: (" << v.x << ", " << v.y << ", " << v.z << ", " << v.w << ")" << std::endl;
-		}
-		else if (line.substr(0, 2) == "f ")
-		{
-			std::string str;
-			std::istringstream s(line.substr(2));
-		
-
-			// TODO: run through each element and check the first value of 
-			//			each block of numbers.
-			// while(s != s.end())
-			GLushort a, b, c;
-			s >> a;
-			s >> b;
-			s >> c;
-			a--; b--; c--;
-			elements.push_back(a);
-			elements.push_back(b);
-			elements.push_back(c);
-		}
-		else if (line[0] == '#')
-		{
-			// ignore this line.
-		}
-		else
-		{
-			// ignore this line.
-		}
-	}
-
-	normals.resize(vertices.size(), glm::vec3(0.f, 0.f, 0.f));
-	for(auto i = 0; i < elements.size(); i += 3)
-	{
-		auto ia = elements[i];
-		auto ib = elements[i + 1];
-		auto ic = elements[i + 2];
-
-		glm::vec3 normal = glm::normalize(glm::cross(
-			glm::vec3(vertices[ib]) - glm::vec3(vertices[ia]),
-			glm::vec3(vertices[ic]) - glm::vec3(vertices[ia])));
-
-		normals[ia] = normal;
-		normals[ib] = normal;
-		normals[ic] = normal;
-	}
-}

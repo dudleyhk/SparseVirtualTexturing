@@ -9,6 +9,9 @@
 
 #include "..\Dependencies\GL\glew.h"
 #include "..\Dependencies\GL\freeglut.h"
+#include "..\..\Dependencies\GLM\gtc\matrix_transform.hpp"
+#include "..\..\Dependencies\GLM\gtc\type_ptr.hpp"
+
 
 #include "VertexFormat.h"
 
@@ -28,6 +31,10 @@ namespace Rendering
 
 		virtual GLuint GetVao() const = 0;
 		virtual const std::vector<GLuint>& GetVbos() const = 0;
+	
+		//TODO: Add transform component.
+	
+	
 	};
 
 	inline IGameObject::~IGameObject()

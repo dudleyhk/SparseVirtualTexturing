@@ -73,9 +73,6 @@ void ShaderManager::CreateProgram(const std::string& shaderName,
 		std::cout << "MESSAGE: Attempting to insert a shader " << shaderName << " which already exists in Programs. Setting it instead." << std::endl;
 		programs[shaderName] = program;
 	}
-
-
-
 }
 
 

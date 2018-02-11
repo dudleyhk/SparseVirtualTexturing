@@ -21,6 +21,7 @@ namespace Managers
 	{
 	public:
 		SceneManager();
+		~SceneManager();
 
 		virtual void NotifyBeginFrame();
 		virtual void NotifyDisplayFrame();
@@ -32,6 +33,9 @@ namespace Managers
 		void LoadObject(const char* filename, std::vector<glm::vec4> &vertices, std::vector<glm::vec3> &normals, std::vector<GLushort> &elements);
 
 		GLuint texture;
+		GLuint pbo[2];
+		GLuint fbo;
+		GLuint render_buffer;
 
 		std::unique_ptr<Managers::ShaderManager> shader_manager = nullptr;
 		std::unique_ptr<Managers::ModelsManager> models_manager = nullptr;

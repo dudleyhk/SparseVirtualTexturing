@@ -29,6 +29,8 @@ namespace Core
 
 			static void Run();
 			static void Close();
+			static int  GetWidth();
+			static int  GetHeight();
 
 			void EnterFullscreen();
 			void ExitFullscreen();

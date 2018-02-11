@@ -85,6 +85,9 @@
     <ClCompile Include="Rendering\Texture\Texture.cpp">
       <Filter>Rendering\Texture</Filter>
     </ClCompile>
+    <ClCompile Include="Rendering\Models\Terrain.cpp">
+      <Filter>Rendering\Models\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Init\WindowInfo.h">
@@ -134,6 +137,9 @@
     </ClInclude>
     <ClInclude Include="Rendering\Texture\Texture.h">
       <Filter>Rendering\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Models\Terrain.h">
+      <Filter>Rendering\Models\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
