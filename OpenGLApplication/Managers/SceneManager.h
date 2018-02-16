@@ -30,9 +30,26 @@ namespace Managers
 								  int previousWidth, int previousHeight);
 
 	private:
-		void LoadObject(const char* filename, std::vector<glm::vec4> &vertices, std::vector<glm::vec3> &normals, std::vector<GLushort> &elements);
+		void InitShaders();
+		void InitTexture();
+		void InitFramebuffer();
+		void InitPixelBuffer();
+		
+		void UpdateFramebuffer();
+		
+		/**	Copy the Pixel Data onscreen to an ofscreen buffer, and then
+				to a Pixel Buffer Object. */
+		void PackingPBO();
 
+		/** Copy the Pixel Data in the PBO to the texture on screen. */
+		void UnpackingPBO();
+
+		/* Changing the brightness.*/
 		void Add(unsigned char* src, int width, int height, int shift, unsigned char* dst);
+
+
+
+
 
 		GLuint texture;
 		GLuint pbo[4];
@@ -50,6 +67,12 @@ namespace Managers
 		const int image_width = 1024;
 		const int image_height = 1024;
 		const int image_data_size = image_width * image_height * nrChannels;
+
+		// aquired from stb
+		int width;
+		int height;
+		int channel;
+		int data_size;
 
 		GLubyte* image_data = 0;             // pointer to texture buffer
 		GLubyte* colour_buffer = 0;
