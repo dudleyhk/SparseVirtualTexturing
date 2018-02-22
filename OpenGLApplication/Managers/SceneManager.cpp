@@ -84,21 +84,25 @@ void SceneManager::InitTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, PIXEL_FORMAT, GL_UNSIGNED_BYTE, (GLvoid*)image_data);
-	
-	//image_data = stbi_load("..//Resources//DestertMountainTexture.jpg", &width, &height, &channel, 0);
-	//if(image_data)
-	//{
-	//	data_size = height * width * channel;
-	//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
-	//	glGenerateMipmap(GL_TEXTURE_2D);
-	//}
-	//else
-	//{
-	//	std::cout << "ERROR: Failed to load texture" << std::endl;
-	//}
-	//stbi_image_free(image_data);
 
+
+
+
+	
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, PIXEL_FORMAT, GL_UNSIGNED_BYTE, (GLvoid*)image_data);
+	
+	image_data = stbi_load("..//Resources//DestertMountainTexture.jpg", &width, &height, &channel, 0);
+	if(image_data)
+	{
+		data_size = height * width * channel;
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "ERROR: Failed to load texture" << std::endl;
+	}
+	stbi_image_free(image_data);
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -129,29 +133,38 @@ void SceneManager::InitFramebuffer()
 
 void SceneManager::InitPixelBuffer()
 {
+	// TODO: This will be causing a memory leak.. v. bad code.
 	image_data = new GLubyte[data_size];
 	memset(image_data, 0, data_size);
 
 	colour_buffer = new GLubyte[screen_data_size];
 	memset(colour_buffer, 0, screen_data_size);
 
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA8, GL_UNSIGNED_BYTE, image_data);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+
 	/* Init PBO for unpacking  */
 	// Create four pixel buffer objects to speed up the streaming transfer performance
-	glGenBuffersARB(4, pbo);
+	glGenBuffersARB(2, pbo);
 
 	// Stream data from PBO to texture buffer.
 	glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, pbo[0]);
-	glBufferDataARB(GL_PIXEL_UNPACK_BUFFER_ARB, data_size, 0, GL_STREAM_DRAW_ARB);
+	glBufferDataARB(GL_PIXEL_UNPACK_BUFFER_ARB, data_size, image_data, GL_STREAM_DRAW_ARB);
 	glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, pbo[1]);
-	glBufferDataARB(GL_PIXEL_UNPACK_BUFFER_ARB, data_size, 0, GL_STREAM_DRAW_ARB);
+	glBufferDataARB(GL_PIXEL_UNPACK_BUFFER_ARB, data_size, image_data, GL_STREAM_DRAW_ARB);
 	glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
 
+
+
+
 	// Stream data from FBO to PBO
-	glBindBufferARB(GL_PIXEL_PACK_BUFFER_ARB, pbo[2]);
-	glBufferDataARB(GL_PIXEL_PACK_BUFFER_ARB, screen_data_size, 0, GL_STREAM_READ_ARB);
-	glBindBufferARB(GL_PIXEL_PACK_BUFFER_ARB, pbo[3]);
-	glBufferDataARB(GL_PIXEL_PACK_BUFFER_ARB, screen_data_size, 0, GL_STREAM_READ_ARB);
-	glBindBufferARB(GL_PIXEL_PACK_BUFFER_ARB, 0);
+	//glBindBufferARB(GL_PIXEL_PACK_BUFFER_ARB, pbo[2]);
+	//glBufferDataARB(GL_PIXEL_PACK_BUFFER_ARB, screen_data_size, 0, GL_STREAM_READ_ARB);
+	//glBindBufferARB(GL_PIXEL_PACK_BUFFER_ARB, pbo[3]);
+	//glBufferDataARB(GL_PIXEL_PACK_BUFFER_ARB, screen_data_size, 0, GL_STREAM_READ_ARB);
+	//glBindBufferARB(GL_PIXEL_PACK_BUFFER_ARB, 0);
 }
 
 
@@ -170,7 +183,7 @@ void SceneManager::NotifyBeginFrame()
 void SceneManager::NotifyDisplayFrame()
 {
 	//PackingPBO();
-	UpdateFramebuffer();
+	//UpdateFramebuffer();
 	UnpackingPBO();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -237,7 +250,7 @@ void SceneManager::UnpackingPBO()
 	int next_index = 0;
 
 	// This flips the id of the role for each pixel buffer.
-	index = (index + 1) % 2;
+	index      = (index + 1) % 2;
 	next_index = (index + 1) % 2;
 
 	// Bind the texture and PBO
@@ -247,7 +260,7 @@ void SceneManager::UnpackingPBO()
 
 	// Copy pixels from PBO to texture object.
 	// Use offset instead of pointer.
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, 0);
 
 	// bind PBO to update pixel value
 	glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, pbo[next_index]);
@@ -266,18 +279,23 @@ void SceneManager::UnpackingPBO()
 	{
 		static int colour = 0;
 		if(!unpack_src) return;
-
 		int* unpack_src_ptr = (int*)unpack_src;
-		for(int i = 0; i < height; i++)
-		{
-			for(int j = 0; j < width; j++)
-			{
-				*unpack_src_ptr = colour;
-				unpack_src_ptr++;
-			}
-			colour += 257;
-		}
-		colour--;
+
+		std::memcpy(unpack_src_ptr, image_data, data_size);
+
+
+		//for(int i = 0; i < height; i++)
+		//{
+		//	for(int j = 0; j < width; j++)
+		//	{
+		//		// TODO: Load texture data from PBO into the texture.
+
+		//		*unpack_src_ptr = colour;
+		//		unpack_src_ptr++;
+		//	}
+		//	colour += 257;
+		//}
+		//colour--;
 		glUnmapBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB);
 	}
 	glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
