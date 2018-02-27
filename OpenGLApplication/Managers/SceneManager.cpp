@@ -28,8 +28,14 @@ SceneManager::SceneManager()
 		std::cout << "ERROR instantiating ModelManager class" << std::endl;
 		return;
 	}
+
+	// TODO: This should be in the GLTexture class.
+	if(!Load("..//Resources//DestertMountainTexture.jpg"))
+	{
+		std::cout << "ERROR: Failed to load texture" << std::endl;
+	}
 	InitTexture();
-	InitFramebuffer();
+	//InitFramebuffer();
 	InitPixelBuffer();
 }
 
@@ -66,43 +72,38 @@ void SceneManager::InitShaders()
 	shader_manager->CreateProgram("TextureShader",
 								  "Shaders\\VertexShaders\\", "TextureShaderVS",
 								  "Shaders\\FragmentShaders\\", "TextureShaderFS");
-
-
 }
+
+
+// Load from disk into RAM
+const bool Managers::SceneManager::Load(const std::string& filename)
+{
+	image_data = stbi_load(filename.c_str(), &width, &height, &channel, STBI_default);
+	if(!image_data)
+	{
+		return false;
+	}
+	stbi_image_free(image_data);
+	return true;
+}
+
+
 
 void SceneManager::InitTexture()
 {
-	width     = image_width;
-	height    = image_height;
-	channel   = nrChannels;
-	data_size = height * width * channel;
-
-	// TODO: Put this in its own class.
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-
-
-
-
-	
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, PIXEL_FORMAT, GL_UNSIGNED_BYTE, (GLvoid*)image_data);
-	
-	image_data = stbi_load("..//Resources//DestertMountainTexture.jpg", &width, &height, &channel, 0);
+	// Load from RAM into VRam
 	if(image_data)
 	{
-		data_size = height * width * channel;
+		glGenTextures(1, &texture);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+		
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
-	else
-	{
-		std::cout << "ERROR: Failed to load texture" << std::endl;
-	}
-	stbi_image_free(image_data);
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -151,9 +152,9 @@ void SceneManager::InitPixelBuffer()
 
 	// Stream data from PBO to texture buffer.
 	glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, pbo[0]);
-	glBufferDataARB(GL_PIXEL_UNPACK_BUFFER_ARB, data_size, image_data, GL_STREAM_DRAW_ARB);
+	glBufferDataARB(GL_PIXEL_UNPACK_BUFFER_ARB, data_size, 0, GL_STREAM_DRAW_ARB);
 	glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, pbo[1]);
-	glBufferDataARB(GL_PIXEL_UNPACK_BUFFER_ARB, data_size, image_data, GL_STREAM_DRAW_ARB);
+	glBufferDataARB(GL_PIXEL_UNPACK_BUFFER_ARB, data_size, 0, GL_STREAM_DRAW_ARB);
 	glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
 
 
@@ -202,8 +203,6 @@ void SceneManager::NotifyResize(int width, int height,
 {
 	//nothing here for the moment 
 }
-
-
 
 
 void SceneManager::Add(unsigned char * src, int width, int height, int shift, unsigned char * dst)
@@ -257,7 +256,6 @@ void SceneManager::UnpackingPBO()
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, pbo[index]);
 
-
 	// Copy pixels from PBO to texture object.
 	// Use offset instead of pointer.
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, 0);
@@ -277,13 +275,6 @@ void SceneManager::UnpackingPBO()
 	GLubyte* unpack_src = (GLubyte*)glMapBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, GL_WRITE_ONLY_ARB);
 	if(unpack_src)
 	{
-		static int colour = 0;
-		if(!unpack_src) return;
-		int* unpack_src_ptr = (int*)unpack_src;
-
-		std::memcpy(unpack_src_ptr, image_data, data_size);
-
-
 		//for(int i = 0; i < height; i++)
 		//{
 		//	for(int j = 0; j < width; j++)

@@ -31,6 +31,31 @@ namespace Managers
 
 	private:
 		void InitShaders();
+		
+		const bool Load(const std::string& filename);
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		void InitTexture();
 		void InitFramebuffer();
 		void InitPixelBuffer();
@@ -46,6 +71,7 @@ namespace Managers
 
 		/* Changing the brightness.*/
 		void Add(unsigned char* src, int width, int height, int shift, unsigned char* dst);
+
 
 
 
