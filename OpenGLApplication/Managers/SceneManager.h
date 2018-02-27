@@ -53,6 +53,7 @@ namespace Managers
 
 		GLuint texture;
 		GLuint pbo[4];
+		GLuint m_pboOutputBuffer;
 		GLuint fbo;
 		GLuint render_buffer;
 		const GLenum PIXEL_FORMAT = GL_BGRA;
