@@ -31,7 +31,14 @@ namespace Managers
 
 	private:
 		void InitShaders();
-		void InitTexture();
+		void InitTextureBuffer();
+
+		const bool Load(const std::string & filename);
+		void GenerateTexture();
+
+
+
+
 		void InitFramebuffer();
 		void InitPixelBuffer();
 		
@@ -50,7 +57,7 @@ namespace Managers
 
 
 
-
+		GLuint blank_texture;
 		GLuint texture;
 		GLuint pbo[4];
 		GLuint fbo;
@@ -71,9 +78,15 @@ namespace Managers
 		// aquired from stb
 		int width;
 		int height;
+
+		int blank_width;
+		int blank_height;
+
 		int channel;
+		int blank_data_size;
 		int data_size;
 
+		GLubyte* blank_image_data = 0;
 		GLubyte* image_data = 0;             // pointer to texture buffer
 		GLubyte* colour_buffer = 0;
 
